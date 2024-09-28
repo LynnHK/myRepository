@@ -23,7 +23,6 @@ public class ExcelUtil {
 
     /**
      * 读取excel文件，支持xlsx、xls格式，仅读取第一个Sheet。
-     *
      * @param filePath 文件绝对路径
      * @return {@link List}
      * @throws IOException 包括{@link FileNotFoundException}
@@ -155,17 +154,7 @@ public class ExcelUtil {
             if (row == null) {
                 continue; // 跳过空行，继续读取后面的行数据
             }
-            Map<String, Object> rowMap = new HashMap<>();
-            // 处理每个单元格
-            for (int j = 0; j < row.getLastCellNum(); j++) {
-                Cell headCell = headRow.getCell(j);
-                if (headCell == null) {
-                    continue; // 跳过空列，继续读取后面的列数据
-                }
-                String key = headCell.getStringCellValue();
-                Object value = getCellValue(row.getCell(j));
-                rowMap.put(key, value); // 将读取到的数据封装成对象
-            }
+            Map<String, Object> rowMap = readRow(headRow, row);
             resList.add(rowMap);
         }
         return resList;
@@ -187,14 +176,46 @@ public class ExcelUtil {
             Map<String, Object> dataMap = dataList.get(i);
             Object[] headNames = headRowMap.keySet().toArray();
             Row row = sheet.createRow(i + 1); // 跳过首行
-            for (int j = 0; j < headNames.length; j++) {
-                Cell cell = row.createCell(j);
-                cell.setCellStyle(cellStyle);
-                Object value = dataMap.get((String) headNames[j]);
-                // System.out.printf("第%d行，第%d列，value:%s%n", i + 2, j + 1, value);
-                setCellValue(cell, value);
-            }
+            writeRow(row, cellStyle, headNames, dataMap);
         }
+    }
+
+    /**
+     * 数据写入行
+     * @param row 指定的行
+     * @param cellStyle 单元格格式
+     * @param headNames 表头名称
+     * @param dataMap 行对象数据
+     */
+    private static void writeRow(Row row, CellStyle cellStyle, Object[] headNames, Map<String, Object> dataMap) {
+        for (int j = 0; j < headNames.length; j++) {
+            Cell cell = row.createCell(j);
+            cell.setCellStyle(cellStyle);
+            Object value = dataMap.get((String) headNames[j]);
+            // System.out.printf("第%d行，第%d列，value:%s%n", i + 2, j + 1, value);
+            setCellValue(cell, value);
+        }
+    }
+
+    /**
+     * 读取一行数据，封装成一个对象
+     * @param headRow 标题行
+     * @param dataRow 数据行
+     * @return {@link Map}
+     */
+    private static Map<String, Object> readRow(Row headRow, Row dataRow) {
+        Map<String, Object> rowMap = new HashMap<>();
+        // 处理每个单元格
+        for (int j = 0; j < dataRow.getLastCellNum(); j++) {
+            Cell headCell = headRow.getCell(j);
+            if (headCell == null) {
+                continue; // 跳过空列，继续读取后面的列数据
+            }
+            String key = headCell.getStringCellValue();
+            Object value = getCellValue(dataRow.getCell(j));
+            rowMap.put(key, value); // 将读取到的数据封装成对象
+        }
+        return rowMap;
     }
 
     /**
