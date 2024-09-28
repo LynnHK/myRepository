@@ -181,23 +181,6 @@ public class ExcelUtil {
     }
 
     /**
-     * 数据写入行
-     * @param row 指定的行
-     * @param cellStyle 单元格格式
-     * @param headNames 表头名称
-     * @param dataMap 行对象数据
-     */
-    private static void writeRow(Row row, CellStyle cellStyle, Object[] headNames, Map<String, Object> dataMap) {
-        for (int j = 0; j < headNames.length; j++) {
-            Cell cell = row.createCell(j);
-            cell.setCellStyle(cellStyle);
-            Object value = dataMap.get((String) headNames[j]);
-            // System.out.printf("第%d行，第%d列，value:%s%n", i + 2, j + 1, value);
-            setCellValue(cell, value);
-        }
-    }
-
-    /**
      * 读取一行数据，封装成一个对象
      * @param headRow 标题行
      * @param dataRow 数据行
@@ -216,6 +199,22 @@ public class ExcelUtil {
             rowMap.put(key, value); // 将读取到的数据封装成对象
         }
         return rowMap;
+    }
+
+    /**
+     * 数据写入行
+     * @param row 指定的行
+     * @param cellStyle 单元格格式
+     * @param headNames 表头名称
+     * @param dataMap 行对象数据
+     */
+    private static void writeRow(Row row, CellStyle cellStyle, Object[] headNames, Map<String, Object> dataMap) {
+        for (int j = 0; j < headNames.length; j++) {
+            Cell cell = row.createCell(j);
+            cell.setCellStyle(cellStyle);
+            Object value = dataMap.get((String) headNames[j]);
+            setCellValue(cell, value);
+        }
     }
 
     /**
